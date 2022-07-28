@@ -3,7 +3,7 @@
 1.	Login to Azure AD (Run and follow instructions)
 
     ```txt
-    az login –use-device-code
+    az login -–use-device-code
     ```
 
 2.	Configure your account to be in the scope of the subscription you will be using
@@ -28,7 +28,7 @@
 5.	Use your previously deployed Kubernetes cluster (AKS) context
 
     ```txt
-    kubectl config use-context <aks name>
+    kubectl config use-context <AKS Name>
     ```
 
 6.  Verify the nodes are running
@@ -100,3 +100,4 @@
 
     ```txt
     az sql mi-arc create --name <SQL MI Name> --resource-group <New RG Name> --location <Region> --custom-location <Custom Location Name> --replicas 3 --cores-request "2" --cores-limit "4" --memory-request "4Gi" --memory-limit "8Gi" --storage-class-data "managed-premium" --storage-class-datalogs "managed-premium" --storage-class-logs "managed-premium" --storage-class-backups "azurefile" --volume-size-data 64Gi --volume-size-datalogs 64Gi --volume-size-logs 5Gi --volume-size-backups 64Gi --tier BusinessCritical --dev --license-type BasePrice
+    ```
