@@ -8,7 +8,7 @@ $directconnectivity = Read-Host - prompt "Are you using for direct connectivity 
 
 
 # Default value start
-$rg_name="levelupaks_lab"
+$rg_name="levelupaks_lab1"
 $StableVersion = "1.22.11"
 #Need to automate with variable to catch the stable version for default value
 '''
