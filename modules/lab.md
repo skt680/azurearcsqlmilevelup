@@ -17,9 +17,16 @@
 
 ### 1.  Install Client Tools on Jumpbox
 
+To install the tools you will need to open Powershell as Administrator
+
 1.  Azure CLI
 
-    Visit https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli via Edge on your jumpbox and download the latest stable version
+    For latest version go to https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli
+
+    ```text
+    $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+    ```
+
 
 2.  ARCData extension for Azure CLI
 
