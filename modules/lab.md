@@ -17,9 +17,9 @@
 
 ### 1.  Install Client Tools on Jumpbox
 
-**To install the tools you will need to open Powershell as Administrator**
+**To install the tools you will need to open Powershell as Administrator and Cmd Prompt**
 
-1.  Azure CLI
+1.  Azure CLI (**via Powershell**)
 
     For latest version go to https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli
 
@@ -29,7 +29,7 @@
 
     **Restart Powershell**
 
-2.  ARCData extension for Azure CLI
+2.  ARCData extension for Azure CLI (**via Powershell**)
 
     To install run 
     ```text
@@ -41,7 +41,7 @@
     az extension update --name arcdata
     ```
 
-3.  Kubectl
+3.  Kubectl (**via Cmd Prompt**)
     
     For latest version go to https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
     Example download using curl for version 1.24.0 
@@ -56,7 +56,12 @@
     curl -LO https://dl.k8s.io/v1.24.0/bin/windows/amd64/kubectl.exe.sha256
     CertUtil -hashfile kubectl.exe SHA256
     type kubectl.exe.sha256
-    kubectl version –client
+    ```
+
+    Ensure you are able to run Kubectl in **Powershell**
+
+    ```text
+    kubectl version –-client
     ```
 
 ### 2. [Deploy Azure AKS Cluster](./aks-deployment.md)
