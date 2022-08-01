@@ -1,6 +1,7 @@
 ## Deploy Azure AKS Cluster (this will host the SQL MI but may exist in Azure, On-Premise, or another Cloud Provider such as AWS)
 
 1.	Login to Azure AD
+
     Run the following to login from your client using your default web browser
     ```text
     az login
