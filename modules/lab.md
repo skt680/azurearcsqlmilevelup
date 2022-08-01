@@ -17,16 +17,17 @@
 
 ### 1.  Install Client Tools on Jumpbox
 
-To install the tools you will need to open Powershell as Administrator
+**To install the tools you will need to open Powershell as Administrator**
 
 1.  Azure CLI
 
     For latest version go to https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli
 
     ```text
-    $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+    Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
     ```
 
+    **Restart Powershell**
 
 2.  ARCData extension for Azure CLI
 
@@ -46,7 +47,7 @@ To install the tools you will need to open Powershell as Administrator
     Example download using curl for version 1.24.0 
 
     ```text
-    curl -LO https://dl.k8s.io/release/v1.24.0/bin/windows/amd64/kubectl.exe 
+    curl -LO https://dl.k8s.io/release/v1.24.0/bin/windows/amd64/kubectl.exe
     ```
 
     Validate by running the following and comparing the two versions in SHA256 format
