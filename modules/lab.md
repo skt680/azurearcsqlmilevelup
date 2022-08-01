@@ -17,19 +17,19 @@
 
 ### 1.  Install Client Tools on Jumpbox
 
-**To install the tools you will need to open Powershell as Administrator and Cmd Prompt**
+**To install the tools you will need to open Powershell as Administrator and**
 
-1.  Azure CLI (**via Powershell**)
+1.  Azure CLI
 
     For latest version go to https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli
 
     ```text
-    Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+    $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
     ```
 
     **Restart Powershell**
 
-2.  ARCData extension for Azure CLI (**via Powershell**)
+2.  ARCData extension for Azure CLI
 
     To install run 
     ```text
@@ -41,24 +41,31 @@
     az extension update --name arcdata
     ```
 
-3.  Kubectl (**via Cmd Prompt**)
+3.  Kubectl
     
     For latest version go to https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
     Example download using curl for version 1.24.0 
 
     ```text
-    curl -LO https://dl.k8s.io/release/v1.24.0/bin/windows/amd64/kubectl.exe
+    $ProgressPreference = 'SilentlyContinue'; mkdir C:\Kube; Invoke-WebRequest -Uri https://dl.k8s.io/release/v1.24.0/bin/windows/amd64/kubectl.exe -OutFile "C:\kube\kubectl.exe"
     ```
 
     Validate by running the following and comparing the two versions in SHA256 format
 
     ```text
-    curl -LO https://dl.k8s.io/v1.24.0/bin/windows/amd64/kubectl.exe.sha256
-    CertUtil -hashfile kubectl.exe SHA256
-    type kubectl.exe.sha256
+    $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://dl.k8s.io/v1.24.0/bin/windows/amd64/kubectl.exe.sha256 -OutFile "C:\kube\kubectl.exe.sha256"
+    CertUtil -hashfile C:\kube\kubectl.exe SHA256
+    type C:\kube\kubectl.exe.sha256
     ```
 
     Ensure you are able to run Kubectl in **Powershell**
+
+    ```text
+    $env:Path += "C:\kube;"
+    [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
+    ```
+
+    **Restart Powershell**
 
     ```text
     kubectl version –-client
