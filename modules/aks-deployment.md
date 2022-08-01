@@ -1,7 +1,11 @@
 ## Deploy Azure AKS Cluster (this will host the SQL MI but may exist in Azure, On-Premise, or another Cloud Provider such as AWS)
 
-1.	Login to Azure AD (Run and follow instructions)
-    
+1.	Login to Azure AD
+    Run the following to login from your client using your default web browser
+    ```text
+    az login
+    ```
+    Run the following to login from another device or non-default web browser    
       ```text
     az login –-use-device-code
     ```
@@ -12,13 +16,13 @@
     az account set –-subscription <Your Subscription Id>
     ```
 
-3. Get list of regions
+3. Display the list of regions you can deploy to
 
     ```text
 	az account list-locations -o table
     ```
 
-4. Create Resource Group
+4. Create Resource Group (if the resource group already exists it will modify it but not delete any resources)
 
     ```text
 	az group create --name <RG Name> --location <Region>
