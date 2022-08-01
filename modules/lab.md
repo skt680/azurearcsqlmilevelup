@@ -68,7 +68,7 @@
     **Restart Powershell**
 
     ```text
-    kubectl version –-client
+    kubectl version --client
     ```
 
 ### 2. [Deploy Azure AKS Cluster](./aks-deployment.md)
