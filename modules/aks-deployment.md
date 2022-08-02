@@ -32,7 +32,7 @@
 5.	Get the latest (IsPreview) and latest stable (Default) version for AKS
 
     ```text 
-    az aks get-versions --location <Region> --query orchestrators –o table
+    az aks get-versions --location <Region> --query orchestrators -o table
     ```
 6.	Create the AKS Cluster on 2 nodes of type Standard_D8s_v3 with a Minimum of 1 node and a Maximum of 5 nodes
     ```text
