@@ -36,7 +36,7 @@
     ```
 6.	Create the AKS Cluster on 2 nodes of type Standard_D8s_v3 with a Minimum of 1 node and a Maximum of 5 nodes
     ```text
-    az aks create -n <AKS Name> -g <RG Name> --generate-ssh-keys –-node-vm-size Standard_D8s_v3 --node-count 2 --kubernetes-version <Stable Version> --enable-cluster-autoscaler --min-count 1 --max-count 5
+    az aks create -n <AKS Name> -g <RG Name> --generate-ssh-keys --node-vm-size Standard_D8s_v3 --node-count 2 --kubernetes-version <Stable Version> --enable-cluster-autoscaler --min-count 1 --max-count 5
     ```
 7.	Configure access with Kubectl and ArcData
 
