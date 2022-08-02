@@ -1,4 +1,4 @@
-## Deploy Azure AKS Cluster (this will host the SQL MI but may exist in Azure, On-Premise, or another Cloud Provider such as AWS)
+## Deploy Azure AKS Cluster (the AKS Cluster will host the SQL MI in Azure but you could also setup Kubernetes on-premise or in another Cloud Provider such as AWS or Google Cloud)
 
 1.	Login to Azure AD
 
@@ -8,13 +8,13 @@
     ```
     Run the following to login from another device or non-default web browser    
       ```text
-    az login –-use-device-code
+    az login --use-device-code
     ```
 
 2.	Configure your account to be in the scope of the subscription you will be using
 
     ```text
-    az account set –-subscription <Your Subscription Id>
+    az account set --subscription <Your Subscription Id>
     ```
 
 3. Display the list of regions you can deploy to
