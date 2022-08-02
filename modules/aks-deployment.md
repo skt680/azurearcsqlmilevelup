@@ -23,7 +23,7 @@
 	az account list-locations -o table
     ```
 
-4. Create Resource Group (if the resource group already exists it will modify it but not delete any resources)
+4. Create Resource Group (if you reuse an existing resource group it will modify any metadata but not delete any existing resources)
 
     ```text
 	az group create --name <RG Name> --location <Region>
