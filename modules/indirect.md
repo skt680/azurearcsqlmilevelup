@@ -65,6 +65,6 @@
     kubectl get services -n <Namespace>
     ```
 
-    Look for entries for <GP SQL MI Name>-external-svc and <BC SQL MI Name>-external-svc and note the Public IP Addresses (EXTERNAL-IP)
+    Look for entries for \<GP SQL MI Name\>-external-svc and \<BC SQL MI Name\>-external-svc and note the Public IP Addresses (EXTERNAL-IP)
 
     You can connect to these IP Addresses using SQL Server Management Studio and Azure Data Studio
