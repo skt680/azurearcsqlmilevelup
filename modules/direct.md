@@ -1,40 +1,44 @@
-## Deploy Azure Arc Enabled SQL MI with Direct Connectivity (Requires new AKS Cluster)
+## Deploy General Purpose and Business Critical Azure Arc Enabled SQL Managed Instances with Direct Connectivity (Requires new AKS Cluster from Lab Step 2)
 
-1.	Login to Azure AD (Run and follow instructions)
+1.	Login to Azure AD
 
-    ```txt
-    az login -–use-device-code
+    Run the following to login from your client using your default web browser
+    ```text
+    az login
+    ```
+    Run the following to login from another device or non-default web browser    
+      ```text
+    az login --use-device-code
     ```
 
 2.	Configure your account to be in the scope of the subscription you will be using
 
-    
-    ```txt
-    az account set –-subscription <Your Subscription Id>
+    ```text
+    az account set --subscription <Your Subscription Id>
     ```
 
-3.	Create Resource Group
-
-    ```txt
-    az group create --name <New RG Name> --location <Region>
-    ```
-
-4.	List Kubernetes cluster contexts from your kubectl config
+3.	List Kubernetes cluster contexts from your kubectl config
 
     ```txt
     kubectl config get-contexts
     ```
 
-5.	Use your previously deployed Kubernetes cluster (AKS) context
+4.	Switch context to the AKS Cluster you will be using to deploy the SQL MI
 
     ```txt
     kubectl config use-context <AKS Name>
     ```
 
-6.  Verify the nodes are running
+5.  Verify the nodes are running
 
     ```txt
     kubectl get nodes
+    ```
+
+6. Create Resource Group (if you reuse an existing resource group it will modify any metadata but not delete any existing resources)
+
+    ```txt
+    az group create --name <New RG Name> --location <Region>
     ```
 
 7.	Install required extensions
