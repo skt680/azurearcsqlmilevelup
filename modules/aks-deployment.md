@@ -1,4 +1,8 @@
-## Deploy Azure AKS Cluster (the AKS Cluster will host the SQL MI in Azure but you could also setup Kubernetes on-premise or in another Cloud Provider such as AWS or Google Cloud)
+## Deploy Azure AKS Cluster
+
+[< Previous Module](../modules/lab.md) - **[Home](../readme.md)** - [Next Module >](../modules/indirect.md)
+
+### The AKS Cluster will host the SQL MI in Azure but you could also setup Kubernetes on-premise or in another Cloud Provider such as AWS or Google Cloud
 
 1.	Login to Azure AD
 
@@ -43,3 +47,4 @@
     ```text
     az aks get-credentials --resource-group <RG Name> --name <AKS Name>
     ```
+[Continue >](../modules/indirect.md)

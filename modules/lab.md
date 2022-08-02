@@ -1,3 +1,7 @@
+# Lab Environment Setup
+
+**[Home](../readme.md)** - [Next Module >](../modules/aks-deployment.md)
+
 ## Prerequisites
 
 * An [Azure account](https://azure.microsoft.com/free/) with an active subscription.
@@ -13,7 +17,7 @@
 
 ### Powershell scripts here
 
-## Manual Setup
+## Lab Environment Setup - Manual
 
 ### 1.  Install Client Tools on Jumpbox
 

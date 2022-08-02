@@ -1,4 +1,8 @@
-## Deploy General Purpose and Business Critical Azure Arc Enabled SQL Managed Instances with Indirect Connectivity (Requires new AKS Cluster from Lab Step 2)
+## Deploy Azure Arc Enabled SQL MI with Indirect Connectivity
+
+[< Previous Module](../modules/aks-deployment.md) - **[Home](../readme.md)** - [Next Module >](../modules/direct.md)
+
+### Deploy General Purpose and Business Critical SQL Managed Instances (Requires new AKS Cluster from Lab Step 2)
 
 1.	Login to Azure AD
 
@@ -68,3 +72,5 @@
     Look for entries for \<GP SQL MI Name\>-external-svc and \<BC SQL MI Name\>-external-svc and note the Public IP Addresses (EXTERNAL-IP)
 
     You can connect to these IP Addresses using SQL Server Management Studio and Azure Data Studio
+
+[Continue >](../modules/direct.md)
