@@ -1,4 +1,4 @@
-## Deploy Azure Arc Enabled SQL MI with Indirect Connectivity (Requires new AKS Cluster from Lab Step 2)
+## Deploy General Purpose and Business Critical Azure Arc Enabled SQL Managed Instances with Indirect Connectivity (Requires new AKS Cluster from Lab Step 2)
 
 1.	Login to Azure AD
 
