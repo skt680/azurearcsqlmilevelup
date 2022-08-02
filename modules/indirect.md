@@ -1,16 +1,20 @@
-## Deploy Azure Arc Enabled SQL MI with Indirect Connectivity (Requires new AKS Cluster)
+## Deploy Azure Arc Enabled SQL MI with Indirect Connectivity (Requires new AKS Cluster from Lab Step 2)
 
-1.	Login to Azure AD (Run and follow instructions)
+1.	Login to Azure AD
 
-    ```txt
-    az login –-use-device-code
+    Run the following to login from your client using your default web browser
+    ```text
+    az login
+    ```
+    Run the following to login from another device or non-default web browser    
+      ```text
+    az login --use-device-code
     ```
 
 2.	Configure your account to be in the scope of the subscription you will be using
 
-    
-    ```txt
-    az account set –-subscription <Your Subscription Id>
+    ```text
+    az account set --subscription <Your Subscription Id>
     ```
 
 3.	List Kubernetes cluster contexts from your kubectl config
