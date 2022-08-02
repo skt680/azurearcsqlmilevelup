@@ -23,7 +23,7 @@
     kubectl config get-contexts
     ```
 
-4.	Use your previously deployed Kubernetes cluster (AKS) context
+4.	Switch context to the AKS Cluster you will be using to deploy the SQL MI
 
     ```txt
     kubectl config use-context <AKS Name>
