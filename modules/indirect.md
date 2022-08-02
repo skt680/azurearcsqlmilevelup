@@ -1,6 +1,6 @@
 ## Deploy Azure Arc Enabled SQL MI with Indirect Connectivity
 
-[< Previous Module](../modules/aks-deployment.md) - **[Home](../readme.md)** - [Next Module >](../modules/direct.md)
+[< Previous Module](../modules/aks-deployment.md) - **[Home](../README.md)** - [Next Module >](../modules/direct.md)
 
 ### Deploy General Purpose and Business Critical SQL Managed Instances (Requires new AKS Cluster from Lab Step 2)
 

@@ -1,6 +1,6 @@
 ## Deploy Azure AKS Cluster
 
-[< Previous Module](../modules/lab.md) - **[Home](../readme.md)** - [Next Module >](../modules/indirect.md)
+[< Previous Module](../modules/lab.md) - **[Home](../README.md)** - [Next Module >](../modules/indirect.md)
 
 ### The AKS Cluster will host the SQL MI in Azure but you could also setup Kubernetes on-premise or in another Cloud Provider such as AWS or Google Cloud
 

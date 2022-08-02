@@ -1,6 +1,6 @@
 # Lab Environment Setup
 
-**[Home](../readme.md)** - [Next Module >](../modules/aks-deployment.md)
+**[Home](../README.md)** - [Next Module >](../modules/aks-deployment.md)
 
 ## Prerequisites
 
