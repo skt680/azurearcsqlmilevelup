@@ -73,7 +73,7 @@
 11.	Get Principal Id from returned JSON
 
     ```txt
-    ```az k8s-extension show --resource-group <RG Name> --cluster-name <AKSName> --cluster-type connectedClusters --name <Extension Name> --query identity.principalId
+    az k8s-extension show --resource-group <RG Name> --cluster-name <AKSName> --cluster-type connectedClusters --name <Extension Name> --query identity.principalId
     ```
 
 12.	Add role assignment to Principal Id
