@@ -127,6 +127,47 @@ During a Arc-enable SQL MI Business Critical upgrade with more than one replica:
 
 ## Restore
 
+1. Create a credential
+
+    [Create SAS tokens](https://docs.microsoft.com/en-us/azure/cognitive-services/translator/document-translation/create-sas-tokens?tabs=Containers)
+
+```sql
+USE master
+GO
+
+IF NOT EXISTS  
+(SELECT * FROM sys.credentials
+WHERE name = 'https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>')  
+BEGIN
+    CREATE CREDENTIAL [https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>]
+    -- this name must match the container path, start with https and must not contain a forward slash at the end
+    WITH IDENTITY = 'SHARED ACCESS SIGNATURE',  -- this is a mandatory string and should not be changed   
+    SECRET = '<SAS_TOKEN>';
+END;
+```
+
+2. Enable the trace flag - There is a bug and the PG is aware of it
+```sql
+DBCC traceon(1820,-1)
+```
+
+3. Verify the backup file is readable, and intact
+
+```sql
+RESTORE FILELISTONLY 
+FROM URL = 'https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>/<file name>.bak'
+```
+
+4. Prepare and run the RESTORE DATABASE
+
+```sql
+RESTORE DATABASE <database name> FROM URL = 'https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>/<file name>.bak'
+WITH MOVE 'Test' to '/var/opt/mssql/data/<file name>.mdf'
+,MOVE 'Test_log' to '/var/opt/mssql/data/<file name>.ldf'
+,RECOVERY;  
+GO
+```
+
 ## Transparent Data Encryption (TDE)
 
 Turning on transparent data encryption in Arc-enable SQL MI follows the same steps as SQL Server on-premises.
@@ -180,7 +221,7 @@ ENCRYPTION BY PASSWORD = '<UseStrongPasswordHere>');
 
 2. Copy the certificate from the container to your file system
    
-    |Operation System  | Command  | Example |
+    |operating System  | Command  | Example |
     |---------  |---------|---------|
     |Windows     | `kubectl exec -n <namespace> -c arc-sqlmi <pod-name> -- cat <pod-certificate-path> > <local-certificate-path>`   | `kubectl exec -n arc-idc-ns -c arc-sqlmi arc-sql-mi-gp-0 -- cat /var/opt/mssql/data/myservercert.crt > C:\temp\sqlcerts\myservercert.crt` |
     |Linux     |    `kubectl cp --namespace <namespace> --container arc-sqlmi <pod-name>:<pod-certificate-path> <local-certificate-path>` | `kubectl cp --namespace arc-idc-ns --container arc-sqlmi arc-sql-mi-gp-0:/var/opt/mssql/data/servercert.crt $HOME/sqlcerts/myservercert.crt` |
@@ -191,7 +232,7 @@ ENCRYPTION BY PASSWORD = '<UseStrongPasswordHere>');
 
 3. Copy the private key from the container to your file system
 
-    |Operation System  |Command  | Example |
+    |operating System  |Command  | Example |
     |---------|---------|---------|
     |Windows     |  `kubectl exec -n <namespace> -c arc-sqlmi <pod-name> -- cat <pod-private-key-path> > <local-private-key-path>`   |`kubectl exec -n arc-idc-ns -c arc-sqlmi arc-sql-mi-gp-0 -- cat /var/opt/mssql/data/myservercert.key > C:\temp\sqlcerts\myservercert.key`|
     |Linux     |  `kubectl cp --namespace <namespace> --container arc-sqlmi <pod-name>:<pod-private-key-path> <local-private-key-path>`        | `kubectl cp --namespace arc-idc-ns --container arc-sqlmi arc-sql-mi-gp-0:/var/opt/mssql/data/myservercert.key $HOME/sqlcerts/myservercert.key`|
