@@ -67,10 +67,132 @@
 
     ```txt
     kubectl get services -n <Namespace>
-    ```
-
+    ``` 
     Look for entries for \<GP SQL MI Name\>-external-svc and \<BC SQL MI Name\>-external-svc and note the Public IP Addresses (EXTERNAL-IP)
 
-    You can connect to these IP Addresses using SQL Server Management Studio and Azure Data Studio
+## Connecting to Arc-enabled SQL Managed Instances
+
+1. View Arc-enabled SQL Managed Instances
+
+    `az sql mi-arc list --k8s-namespace <namespace> --use-k8s -o table`
+
+    ![view-arc-enabled-sql-mi](media/view-arc-enabled-sql-mi.png)
+
+2. Add NSG rule for your Azure Kubernetes
+    1. Getting NSG name
+
+     `az network nsg list -g <Node RG Name> --query "[].{NSGName:name}" -o table`
+    2. Add NSG rule to allow your IP
+
+    `az network nsg rule create -n db_port --destination-port-ranges 1433 --source-address-prefixes '*' --nsg-name <NSG Name> --priority 500 -g <Node RG Name> --access Allow --description 'Allow port through for db access' --destination-address-prefixes '*' --direction Inbound --protocol Tcp --source-port-ranges '*'`
+
+3. Connect to your Arc-enabled SQL Managed Instances General Purpose
+    1. Get the IP from the step 11 and connect to Arc-enabled SQL MI GP using SQL Server Management Studio and Azure Data Studio  
+    ![connect-to-arc-enabled-sql-mi](media/connect-to-arc-enabled-sql-mi.png)
+    2. [Connect to Azure Arc-enabled SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-arc/data/connect-managed-instance)
+    ![overview-ads-arc-enabled-sql-mi](media/overview-ads-arc-enabled-sql-mi.png)
+
+## Upgrading the Arc-enable SQL MI
+
+1. The dry run validates the version schema and lists which instance(s) will be upgraded
+
+   `az sql mi-arc upgrade --name <instance name> --k8s-namespace <namespace> --dry-run --use-k8s`
+
+   ![](media/upgrade-arc-enable-sql-mi.png)
+
+### General Purpose
+
+> [!CAUTION]
+> During a **Arc-enable SQL MI General Purpose** upgrade, the pod will be terminated and reprovisioned at the new version. This will cause a short amount of downtime as the new pod is created.
+
+### Business Critical
+
+During a Arc-enable SQL MI Business Critical upgrade with more than one replica:
+
+- The secondary replica pods are terminated and reprovisioned at the new version
+- After the replicas are upgraded, the primary will fail over to an upgraded replica
+- The previous primary pod is terminated and reprovisioned at the new version, and - becomes a secondary
+
+> [!CAUTION]
+> There is a brief moment of downtime when the failover occurs.
+
+1. To upgrade Arc-enable SQL MI, use the following command
+
+    `az sql mi-arc upgrade --name <instance name> --desired-version <version> --k8s-namespace <namespace> --use-k8s`
+
+2. Monitor the progress of the upgrade with the show command
+
+    `az sql mi-arc show --name <instance name> --k8s-namespace <namespace> --use-k8s`
+
+## Restore
+
+## Transparent Data Encryption (TDE)
+
+Turning on transparent data encryption in Arc-enable SQL MI follows the same steps as SQL Server on-premises.
+
+Use the following steps to [enable TDE](https://docs.microsoft.com/sql/relational-databases/security/encryption/transparent-data-encryption?view=sql-server-ver16#enable-tde). 
+
+```sql
+USE master;
+GO
+
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'UseStrongPasswordHere!';
+GO
+
+CREATE CERTIFICATE MyServerCert WITH SUBJECT = 'My DEK Certificate';
+go
+
+USE AdventureWorks;
+GO
+
+CREATE DATABASE ENCRYPTION KEY
+WITH ALGORITHM = AES_256
+ENCRYPTION BY SERVER CERTIFICATE MyServerCert;
+GO
+
+ALTER DATABASE AdventureWorks
+SET ENCRYPTION ON;
+GO
+
+USE AdventureWorks;
+GO
+/* The value 3 represents an encrypted state
+   on the database and transaction logs. */
+SELECT *
+FROM sys.dm_database_encryption_keys
+WHERE encryption_state = 3;
+GO
+```
+
+### Back up a transparent data encryption credential
+
+1. Back up the certificate from the container to /var/opt/mssql/data
+
+```sql
+USE master;
+GO
+
+BACKUP CERTIFICATE <cert-name> TO FILE = '<cert-path>'
+WITH PRIVATE KEY ( FILE = '<private-key-path>',
+ENCRYPTION BY PASSWORD = '<UseStrongPasswordHere>');
+```
+
+2. Copy the certificate from the container to your file system
+   
+    |Operation System  | Command  | Example |
+    |---------  |---------|---------|
+    |Windows     | `kubectl exec -n <namespace> -c arc-sqlmi <pod-name> -- cat <pod-certificate-path> > <local-certificate-path>`   | `kubectl exec -n arc-idc-ns -c arc-sqlmi arc-sql-mi-gp-0 -- cat /var/opt/mssql/data/myservercert.crt > C:\temp\sqlcerts\myservercert.crt` |
+    |Linux     |    `kubectl cp --namespace <namespace> --container arc-sqlmi <pod-name>:<pod-certificate-path> <local-certificate-path>` | `kubectl cp --namespace arc-idc-ns --container arc-sqlmi arc-sql-mi-gp-0:/var/opt/mssql/data/servercert.crt $HOME/sqlcerts/myservercert.crt` |
+
+    To get pods name use this command
+
+    `kubectl get pods -n <namespace>`
+
+3. Copy the private key from the container to your file system
+
+    |Operation System  |Command  | Example |
+    |---------|---------|---------|
+    |Windows     |  `kubectl exec -n <namespace> -c arc-sqlmi <pod-name> -- cat <pod-private-key-path> > <local-private-key-path>`   |`kubectl exec -n arc-idc-ns -c arc-sqlmi arc-sql-mi-gp-0 -- cat /var/opt/mssql/data/myservercert.key > C:\temp\sqlcerts\myservercert.key`|
+    |Linux     |  `kubectl cp --namespace <namespace> --container arc-sqlmi <pod-name>:<pod-private-key-path> <local-private-key-path>`        | `kubectl cp --namespace arc-idc-ns --container arc-sqlmi arc-sql-mi-gp-0:/var/opt/mssql/data/myservercert.key $HOME/sqlcerts/myservercert.key`|
 
 [Continue >](../modules/direct.md)
