@@ -82,6 +82,7 @@
     1. Getting NSG name
 
      `az network nsg list -g <Node RG Name> --query "[].{NSGName:name}" -o table`
+
     2. Add NSG rule to allow your IP
 
     `az network nsg rule create -n db_port --destination-port-ranges 1433 --source-address-prefixes '*' --nsg-name <NSG Name> --priority 500 -g <Node RG Name> --access Allow --description 'Allow port through for db access' --destination-address-prefixes '*' --direction Inbound --protocol Tcp --source-port-ranges '*'`
