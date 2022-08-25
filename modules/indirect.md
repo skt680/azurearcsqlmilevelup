@@ -4,60 +4,63 @@
 
 ### Deploy General Purpose and Business Critical SQL Managed Instances (Requires new AKS Cluster from Lab Step 2)
 
-1.	Login to Azure AD
+1. Login to Azure AD
 
     Run the following to login from your client using your default web browser
+
     ```text
     az login
     ```
-    Run the following to login from another device or non-default web browser    
+
+    Run the following to login from another device or non-default web browser
+
       ```text
     az login --use-device-code
     ```
 
-2.	Configure your account to be in the scope of the subscription you will be using
+2. Configure your account to be in the scope of the subscription you will be using
 
     ```text
     az account set --subscription <Your Subscription Id>
     ```
 
-3.	List Kubernetes cluster contexts from your kubectl config
+3. List Kubernetes cluster contexts from your kubectl config
 
     ```txt
     kubectl config get-contexts
     ```
 
-4.	Switch context to the AKS Cluster you will be using to deploy the SQL MI
+4. Switch context to the AKS Cluster you will be using to deploy the SQL MI
 
     ```txt
     kubectl config use-context <AKS Name>
     ```
 
-5.  Verify the nodes are running
+5. Verify the nodes are running
 
     ```txt
     kubectl get nodes
     ```
 
-6.	Deploy Data Controller using Azure Infrastructure (see **[reference](https://docs.microsoft.com/en-us/cli/azure/arcdata/dc?view=azure-cli-latest)** for more info)
+6. Deploy Data Controller using Azure Infrastructure (see **[reference](https://docs.microsoft.com/en-us/cli/azure/arcdata/dc?view=azure-cli-latest)** for more info)
 
     ```txt
     az arcdata dc create --connectivity-mode indirect --name <Data Controller Name e.g. arc-idc> --subscription <Your Subscription Id> --resource-group <RG Name> --location <Region> --profile-name azure-arc-aks-premium-storage --k8s-namespace <Namespace e.g. arc-idc-ns> --use-k8s
     ```
 
-7.	Verify Data Controller (DC) has been created successfully by ensuring new pods have been created for the DC
+7. Verify Data Controller (DC) has been created successfully by ensuring new pods have been created for the DC
 
     ```txt
     kubectl get pods -n <Namespace>
     ```
 
-8.	Deploy a Development General Purpose Arc Enabled SQL MI with 1 replica, 2 vCores with a maximum of 4, 4GB of memory with a maximum of 8, managed premium storage for everything apart from backups where managed premium is not available (see **[reference](https://docs.microsoft.com/en-us/cli/azure/sql/mi-arc?view=azure-cli-latest)** for more info)
+8. Deploy a Development General Purpose Arc Enabled SQL MI with 1 replica, 2 vCores with a maximum of 4, 4GB of memory with a maximum of 8, managed premium storage for everything apart from backups where managed premium is not available (see **[reference](https://docs.microsoft.com/en-us/cli/azure/sql/mi-arc?view=azure-cli-latest)** for more info)
 
     ```txt
     az sql mi-arc create --name <GP SQL MI Name> --k8s-namespace <Namespace> --replicas 1 --cores-request "2" --cores-limit "4" --memory-request "4Gi" --memory-limit "8Gi" --storage-class-data "managed-premium" --storage-class-datalogs "managed-premium" --storage-class-logs "managed-premium" --storage-class-backups "azurefile" --volume-size-data 64Gi --volume-size-datalogs 64Gi --volume-size-logs 5Gi --volume-size-backups 64Gi --tier GeneralPurpose --dev --license-type BasePrice --use-k8s
     ```
 
-9.	Deploy a Development Business Critical Arc Enabled SQL MI with 3 replicas, 2 vCores with a maximum of 4, 4GB of memory with a maximum of 8, managed premium storage for everything apart from backups
+9. Deploy a Development Business Critical Arc Enabled SQL MI with 3 replicas, 2 vCores with a maximum of 4, 4GB of memory with a maximum of 8, managed premium storage for everything apart from backups
 
     ```txt
     az sql mi-arc create --name <BC SQL MI Name> --k8s-namespace <Namespace> --replicas 3 --cores-request "2" --cores-limit "4" --memory-request "4Gi" --memory-limit "8Gi" --storage-class-data "managed-premium" --storage-class-datalogs "managed-premium" --storage-class-logs "managed-premium" --storage-class-backups "azurefile" --volume-size-data 64Gi --volume-size-datalogs 64Gi --volume-size-logs 5Gi --volume-size-backups 64Gi --tier BusinessCritical --dev --license-type BasePrice --use-k8s
@@ -67,7 +70,8 @@
 
     ```txt
     kubectl get services -n <Namespace>
-    ``` 
+    ```
+
     Look for entries for \<GP SQL MI Name\>-external-svc and \<BC SQL MI Name\>-external-svc and note the Public IP Addresses (EXTERNAL-IP)
 
 ## Connecting to Arc-enabled SQL Managed Instances
@@ -93,6 +97,28 @@
     2. [Connect to Azure Arc-enabled SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-arc/data/connect-managed-instance)
     ![overview-ads-arc-enabled-sql-mi](media/overview-ads-arc-enabled-sql-mi.png)
 
+## Upgrading the Arc-enable Data Controller
+
+1. Pull the list of available images for the data controller with the following command:
+
+    `az arcdata dc list-upgrades --k8s-namespace <namespace>`
+
+    ![media/upgrade-arc-enable-dc-list-images](media/upgrade-arc-enable-dc-list-images.png)
+
+2. You can perform a dry run first. The dry run validates the registry exists, the version schema, and the private repository authorization token (if used).
+
+    `az arcdata dc upgrade --desired-version <version> --k8s-namespace <namespace> --dry-run --use-k8s`
+
+3. To upgrade the data controller, run the az arcdata dc upgrade command, specifying the image tag with **--desired-version**.
+
+    `az arcdata dc upgrade --name <data controller name> --desired-version <image tag> --k8s-namespace <namespace> --use-k8s`
+
+    ![upgrade-arc-enable-dc-successsfully](media/upgrade-arc-enable-dc-successsfully.png)
+
+4. Monitor the upgrade status
+
+   `az arcdata dc status show --name <data controller name> --k8s-namespace <namespace> --use-k8s`
+
 ## Upgrading the Arc-enable SQL MI
 
 1. The dry run validates the version schema and lists which instance(s) will be upgraded
@@ -100,6 +126,8 @@
    `az sql mi-arc upgrade --name <instance name> --k8s-namespace <namespace> --dry-run --use-k8s`
 
    ![](media/upgrade-arc-enable-sql-mi.png)
+
+    To upgrade the data controller, run the az arcdata dc upgrade command, specifying the image tag with --desired-version.
 
 ### General Purpose
 
@@ -125,6 +153,22 @@ During a Arc-enable SQL MI Business Critical upgrade with more than one replica:
 
     `az sql mi-arc show --name <instance name> --k8s-namespace <namespace> --use-k8s`
 
+## Enable SQL Server Agent
+
+SQL Server agent is disabled by default.
+
+1. To enable SQL Server Agent run:
+
+    `az sql mi-arc update -n <instance name> --k8s-namespace <namespace> --use-k8s --agent-enabled true`
+
+    ![enable-sql-agent-arc-enable-direct-mode](media/enable-sql-agent-arc-enable-direct-mode.png)
+
+2. Verifying if it is enabled
+
+    `az sql mi-arc show --resource-group arc-direct --name sql-mi-bc`
+
+    ![enable-sql-agent-arc-enable-direct-mode-verifying](media/enable-sql-agent-arc-enable-direct-mode-verifying.png)
+
 ## Restore
 
 1. Create a credential
@@ -147,6 +191,7 @@ END;
 ```
 
 2. Enable the trace flag - There is a bug and the PG is aware of it
+
 ```sql
 DBCC traceon(1820,-1)
 ```
@@ -172,7 +217,7 @@ GO
 
 Turning on transparent data encryption in Arc-enable SQL MI follows the same steps as SQL Server on-premises.
 
-Use the following steps to [enable TDE](https://docs.microsoft.com/sql/relational-databases/security/encryption/transparent-data-encryption?view=sql-server-ver16#enable-tde). 
+Use the following steps to [enable TDE](https://docs.microsoft.com/sql/relational-databases/security/encryption/transparent-data-encryption?view=sql-server-ver16#enable-tde).
 
 ```sql
 USE master;
@@ -220,7 +265,7 @@ ENCRYPTION BY PASSWORD = '<UseStrongPasswordHere>');
 ```
 
 2. Copy the certificate from the container to your file system
-   
+
     |operating System  | Command  | Example |
     |---------  |---------|---------|
     |Windows     | `kubectl exec -n <namespace> -c arc-sqlmi <pod-name> -- cat <pod-certificate-path> > <local-certificate-path>`   | `kubectl exec -n arc-idc-ns -c arc-sqlmi arc-sql-mi-gp-0 -- cat /var/opt/mssql/data/myservercert.crt > C:\temp\sqlcerts\myservercert.crt` |
