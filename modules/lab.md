@@ -13,6 +13,15 @@
 
     [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fskt680%2Fazurearcsqlmilevelup%2Fmain%2Ftemplates%2Fjumpbox.json)
 
+Deployment diagram
+
+![deploy-diagram](media/deploy-diagram.png)
+
+Deployed resources
+
+![level-up-resources-1](media/level-up-resources-1.png)
+
+
 ## Lab Environment Setup - Automated
 
 ### Powershell scripts here
@@ -39,11 +48,13 @@
     ```text
     az extension add --name arcdata
     ```
+    ![arc-data-extension-install](media/arc-data-extension-install.png)
 
     To upgrade run 
     ```text
     az extension update --name arcdata
     ```
+    ![arc-data-extension-update](media/arc-data-extension-update.png)
 
 3.  Kubectl
     
@@ -53,6 +64,8 @@
     ```text
     $ProgressPreference = 'SilentlyContinue'; mkdir C:\Kube; Invoke-WebRequest -Uri https://dl.k8s.io/release/v1.24.0/bin/windows/amd64/kubectl.exe -OutFile "C:\kube\kubectl.exe"
     ```
+    ![kubectl-install](media/kubectl-install.png)
+
 
     Validate by running the following and comparing the two versions in SHA256 format
 
@@ -61,6 +74,7 @@
     CertUtil -hashfile C:\kube\kubectl.exe SHA256
     type C:\kube\kubectl.exe.sha256
     ```
+    ![kubectl-sha5](media/kubectl-sha5.png)
 
     Ensure you are able to run Kubectl in **Powershell**
 
@@ -68,12 +82,15 @@
     $env:Path += "C:\kube;"
     [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
     ```
+    ![kubectl-path](media/kubectl-path.png)
 
     **Restart Powershell**
 
     ```text
     kubectl version --client
     ```
+    ![kubectl-version](media/kubectl-version.png)
+
 
 ### 2. [Deploy Azure AKS Cluster](./aks-deployment.md)
 ### 3. [Deploy Azure Arc Enabled SQL MI with Indirect Connectivity](./indirect.md)
