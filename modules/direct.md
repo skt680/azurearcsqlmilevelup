@@ -162,7 +162,7 @@
 
     2. Add NSG rule to allow your IP
 
-    `az network nsg rule create -n db_port --destination-port-ranges 1433 --source-address-prefixes '*' --nsg-name <NSG Name> --priority 500 -g <Node RG Name> --access Allow --description 'Allow port through for db access' --destination-address-prefixes '*' --direction Inbound --protocol Tcp --source-port-ranges '*'`
+    `az network nsg rule create -n db_port --destination-port-ranges 1433 --source-address-prefixes "*" --nsg-name <NSG Name> --priority 500 -g <Node RG Name> --access Allow --description 'Allow port through for db access' --destination-address-prefixes "*" --direction Inbound --protocol Tcp --source-port-ranges "*"`
 
 3. Connect to your Arc-enabled SQL Managed Instances General Purpose
     1. Get the IP from the step 11 and connect to Arc-enabled SQL MI GP using SQL Server Management Studio and Azure Data Studio  
@@ -301,6 +301,9 @@ GO
 Turning on transparent data encryption in Arc-enable SQL MI follows the same steps as SQL Server on-premises.
 
 Use the following steps to [enable TDE](https://docs.microsoft.com/sql/relational-databases/security/encryption/transparent-data-encryption?view=sql-server-ver16#enable-tde).
+
+> [!WARNING]
+> If you are performing a **point-in-time restore (PITR)**, there is no support for restoring a TDE enabled database currently.
 
 ```sql
 USE master;
