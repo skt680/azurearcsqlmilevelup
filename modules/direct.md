@@ -367,3 +367,54 @@ ENCRYPTION BY PASSWORD = '<UseStrongPasswordHere>');
     |---------|---------|---------|
     |Windows     |  `kubectl exec -n <namespace> -c arc-sqlmi <pod-name> -- cat <pod-private-key-path> > <local-private-key-path>`   |`kubectl exec -n arc-idc-ns -c arc-sqlmi arc-sql-mi-gp-0 -- cat /var/opt/mssql/data/myservercert.key > C:\temp\sqlcerts\myservercert.key`|
     |Linux     |  `kubectl cp --namespace <namespace> --container arc-sqlmi <pod-name>:<pod-private-key-path> <local-private-key-path>`        | `kubectl cp --namespace arc-idc-ns --container arc-sqlmi arc-sql-mi-gp-0:/var/opt/mssql/data/myservercert.key $HOME/sqlcerts/myservercert.key`|
+
+## High availability in General Purpose service tier
+
+### Verify built-in high availability
+
+**1. View the pods.**
+
+ `kubectl get pods -n <namespace of data controller>`
+
+![pod-list](media/pods_list.png)
+
+**2. Delete the managed instance pod.**
+
+`kubectl delete pod <name of managed instance>-0 -n <namespace of data controller>`
+
+**3. View the pods to verify that the managed instance is recovering.**
+
+`kubectl get pods -n <namespace of data controller>`
+
+![pod-list](media/Ha-delete-Available.png)
+
+### Checking High availability Replicas
+
+```sql
+SELECT * FROM sys.dm_hadr_availability_replica_states
+```
+
+![Ha-and-replicas](media/Ha-and-replicas.png)
+
+## Failover scenarios
+
+To fail over from the primary replica to one of the secondaries, for a planned event, run the following command:
+
+If you connect to primary, you can use following T-SQL to fail over the SQL instance to one of the secondaries:
+
+```sql
+ALTER AVAILABILITY GROUP current SET (ROLE = SECONDARY);
+```
+
+![Primary-to-secondary](media/Primary-to-secondary.png)
+
+If you connect to the secondary, you can use following T-SQL to promote the desired secondary to primary replica.
+
+
+```sql
+ALTER AVAILABILITY GROUP current SET (ROLE = PRIMARY);
+
+```
+Secondary-to-primary
+
+![Secondary-to-primary](media/Secondary-to-primary.png)
