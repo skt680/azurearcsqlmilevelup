@@ -1,8 +1,8 @@
-## Deploy Azure Arc Enabled SQL MI with Indirect Connectivity
+# Deploy Azure Arc Enabled SQL MI with Indirect Connectivity
 
 [< Previous Module](../modules/aks-deployment.md) - **[Home](../README.md)** - [Next Module >](../modules/direct.md)
 
-### Deploy General Purpose and Business Critical SQL Managed Instances (Requires new AKS Cluster from Lab Step 2)
+## Deploy General Purpose and Business Critical SQL Managed Instances (Requires new AKS Cluster from Lab Step 2)
 
 1. Login to Azure AD
 
@@ -11,6 +11,7 @@
     ```text
     az login
     ```
+
     ![az-login](media/az-login.png)
 
     Run the following to login from another device or non-default web browser
@@ -24,6 +25,7 @@
     ```text
     az account set --subscription <Your Subscription Id>
     ```
+
     ![az-subscription](media/az-subscription.png)
 
 3. List Kubernetes cluster contexts from your kubectl config
@@ -31,6 +33,7 @@
     ```txt
     kubectl config get-contexts
     ```
+
     ![az-aks-get-context](media/az-aks-get-context.png)
 
 4. Switch context to the AKS Cluster you will be using to deploy the SQL MI
@@ -38,12 +41,14 @@
     ```txt
     kubectl config use-context <AKS Name>
     ```
+
     ![az-aks-set-context](media/az-aks-set-context.png)
 5. Verify the nodes are running
 
     ```txt
     kubectl get nodes
     ```
+
     ![az-aks-get-nodes](media/az-aks-get-nodes.png)
 
 6. Deploy Data Controller using Azure Infrastructure (see **[reference](https://docs.microsoft.com/en-us/cli/azure/arcdata/dc?view=azure-cli-latest)** for more info)
@@ -51,6 +56,7 @@
     ```txt
     az arcdata dc create --connectivity-mode indirect --name <Data Controller Name e.g. arc-idc> --subscription <Your Subscription Id> --resource-group <RG Name> --location <Region> --profile-name azure-arc-aks-premium-storage --k8s-namespace <Namespace e.g. arc-idc-ns> --use-k8s
     ```
+
     ![az-aks-ind-dc-create](media/az-aks-ind-dc-create.png)
 
 7. Verify Data Controller (DC) has been created successfully by ensuring new pods have been created for the DC
@@ -58,6 +64,7 @@
     ```txt
     kubectl get pods -n <Namespace>
     ```
+
     ![az-aks-get-pods](media/az-aks-get-pods.png)
 
 8. Deploy a Development General Purpose Arc Enabled SQL MI with 1 replica, 2 vCores with a maximum of 4, 4GB of memory with a maximum of 8, managed premium storage for everything apart from backups where managed premium is not available (see **[reference](https://docs.microsoft.com/en-us/cli/azure/sql/mi-arc?view=azure-cli-latest)** for more info)
@@ -65,6 +72,7 @@
     ```txt
     az sql mi-arc create --name <GP SQL MI Name> --k8s-namespace <Namespace> --replicas 1 --cores-request "2" --cores-limit "4" --memory-request "4Gi" --memory-limit "8Gi" --storage-class-data "managed-premium" --storage-class-datalogs "managed-premium" --storage-class-logs "managed-premium" --storage-class-backups "azurefile" --volume-size-data 64Gi --volume-size-datalogs 64Gi --volume-size-logs 5Gi --volume-size-backups 64Gi --tier GeneralPurpose --dev --license-type BasePrice --use-k8s
     ```
+
     ![az-aks-create-sqlmi-gp](media/az-aks-create-sqlmi-gp.png)
 
 9. Deploy a Development Business Critical Arc Enabled SQL MI with 3 replicas, 2 vCores with a maximum of 4, 4GB of memory with a maximum of 8, managed premium storage for everything apart from backups
@@ -72,6 +80,7 @@
     ```txt
     az sql mi-arc create --name <BC SQL MI Name> --k8s-namespace <Namespace> --replicas 3 --cores-request "2" --cores-limit "4" --memory-request "4Gi" --memory-limit "8Gi" --storage-class-data "managed-premium" --storage-class-datalogs "managed-premium" --storage-class-logs "managed-premium" --storage-class-backups "azurefile" --volume-size-data 64Gi --volume-size-datalogs 64Gi --volume-size-logs 5Gi --volume-size-backups 64Gi --tier BusinessCritical --dev --license-type BasePrice --use-k8s
     ```
+
     ![az-aks-create-sqlmi-bc](media/az-aks-create-sqlmi-bc.png)
 
 10. Verify both Managed Instances were successfully created
@@ -79,27 +88,33 @@
     ```txt
     kubectl get services -n <Namespace>
     ```
+
     Look for entries for \<GP SQL MI Name\>-external-svc and \<BC SQL MI Name\>-external-svc and note the Public IP Addresses (EXTERNAL-IP)
 
     ![az-aks-list-services](media/az-aks-list-services.png)
-
 
 ## Connecting to Arc-enabled SQL Managed Instances
 
 1. View Arc-enabled SQL Managed Instances
 
-    `az sql mi-arc list --k8s-namespace <namespace> --use-k8s -o table`
+    ```txt
+    az sql mi-arc list --k8s-namespace <namespace> --use-k8s -o table
+    ```
 
     ![view-arc-enabled-sql-mi](media/view-arc-enabled-sql-mi.png)
 
 2. Add NSG rule for your Azure Kubernetes
     1. Getting NSG name
 
-     `az network nsg list -g <Node RG Name> --query "[].{NSGName:name}" -o table`
+     ```txt
+     az network nsg list -g <Node RG Name> --query "[].{NSGName:name}" -o table
+     ```txt
 
     2. Add NSG rule to allow your IP
 
-    `az network nsg rule create -n db_port --destination-port-ranges 1433 --source-address-prefixes "*" --nsg-name <NSG Name> --priority 500 -g <Node RG Name> --access Allow --description "Allow port through for db access" --destination-address-prefixes "*" --direction Inbound --protocol Tcp --source-port-ranges "*"`
+    ```txt
+    az network nsg rule create -n db_port --destination-port-ranges 1433 --source-address-prefixes "*" --nsg-name <NSG Name> --priority 500 -g <Node RG Name> --access Allow --description "Allow port through for db access" --destination-address-prefixes "*" --direction Inbound --protocol Tcp --source-port-ranges "*"
+    ```
 
 3. Connect to your Arc-enabled SQL Managed Instances General Purpose
     1. Get the IP from the step 11 and connect to Arc-enabled SQL MI GP using SQL Server Management Studio and Azure Data Studio  
@@ -111,31 +126,41 @@
 
 1. Pull the list of available images for the data controller with the following command:
 
-    `az arcdata dc list-upgrades --k8s-namespace <namespace>`
+    ```txt
+    az arcdata dc list-upgrades --k8s-namespace <namespace>
+    ```
 
     ![media/upgrade-arc-enable-dc-list-images](media/upgrade-arc-enable-dc-list-images.png)
 
 2. You can perform a dry run first. The dry run validates the registry exists, the version schema, and the private repository authorization token (if used).
 
-    `az arcdata dc upgrade --desired-version <version> --k8s-namespace <namespace> --dry-run --use-k8s`
+    ```txt
+    az arcdata dc upgrade --desired-version <version> --k8s-namespace <namespace> --dry-run --use-k8s
+    ```
 
 3. To upgrade the data controller, run the az arcdata dc upgrade command, specifying the image tag with **--desired-version**.
 
-    `az arcdata dc upgrade --name <data controller name> --desired-version <image tag> --k8s-namespace <namespace> --use-k8s`
+    ```txt
+    az arcdata dc upgrade --name <data controller name> --desired-version <image tag> --k8s-namespace <namespace> --use-k8s
+    ```
 
     ![upgrade-arc-enable-dc-successsfully](media/upgrade-arc-enable-dc-successsfully.png)
 
 4. Monitor the upgrade status
 
-   `az arcdata dc status show --name <data controller name> --k8s-namespace <namespace> --use-k8s`
+   ```txt
+   az arcdata dc status show --name <data controller name> --k8s-namespace <namespace> --use-k8s
+   ```
 
 ## Upgrading the Arc-enable SQL MI
 
 1. The dry run validates the version schema and lists which instance(s) will be upgraded
 
-   `az sql mi-arc upgrade --name <instance name> --k8s-namespace <namespace> --dry-run --use-k8s`
+   ```txt
+   az sql mi-arc upgrade --name <instance name> --k8s-namespace <namespace> --dry-run --use-k8s`
+   ```
 
-   ![](media/upgrade-arc-enable-sql-mi.png)
+   ![upgrade-arc-enable-sql-mi](media/upgrade-arc-enable-sql-mi.png)
 
     To upgrade the data controller, run the az arcdata dc upgrade command, specifying the image tag with --desired-version.
 
@@ -157,11 +182,15 @@ During a Arc-enable SQL MI Business Critical upgrade with more than one replica:
 
 1. To upgrade Arc-enable SQL MI, use the following command
 
-    `az sql mi-arc upgrade --name <instance name> --desired-version <version> --k8s-namespace <namespace> --use-k8s`
+    ```txt
+    az sql mi-arc upgrade --name <instance name> --desired-version <version> --k8s-namespace <namespace> --use-k8s
+    ```
 
 2. Monitor the progress of the upgrade with the show command
 
-    `az sql mi-arc show --name <instance name> --k8s-namespace <namespace> --use-k8s`
+    ```txt
+    az sql mi-arc show --name <instance name> --k8s-namespace <namespace> --use-k8s
+    ```
 
 ## Enable SQL Server Agent
 
@@ -169,49 +198,55 @@ SQL Server agent is disabled by default.
 
 1. To enable SQL Server Agent run:
 
-    `az sql mi-arc update -n <instance name> --k8s-namespace <namespace> --use-k8s --agent-enabled true`
+    ```txt
+    az sql mi-arc update -n <instance name> --k8s-namespace <namespace> --use-k8s --agent-enabled true
+    ```
 
     ![enable-sql-agent-arc-enable-direct-mode](media/enable-sql-agent-arc-enable-direct-mode.png)
 
 2. Verifying if it is enabled
 
-    `az sql mi-arc show --resource-group arc-direct --name sql-mi-bc`
+    ```txt
+    az sql mi-arc show --resource-group arc-direct --name sql-mi-bc
+    ```
 
     ![enable-sql-agent-arc-enable-direct-mode-verifying](media/enable-sql-agent-arc-enable-direct-mode-verifying.png)
 
-## Restore
+## Restore a database
+
+### From a Azure Storage Account
 
 1. Create a credential
 
     [Create SAS tokens](https://docs.microsoft.com/en-us/azure/cognitive-services/translator/document-translation/create-sas-tokens?tabs=Containers)
 
-```sql
-USE master
-GO
+    ```sql
+    USE master
+    GO
 
-IF NOT EXISTS  
-(SELECT * FROM sys.credentials
-WHERE name = 'https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>')  
-BEGIN
-    CREATE CREDENTIAL [https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>]
-    -- this name must match the container path, start with https and must not contain a forward slash at the end
-    WITH IDENTITY = 'SHARED ACCESS SIGNATURE',  -- this is a mandatory string and should not be changed   
-    SECRET = '<SAS_TOKEN>';
-END;
-```
+    IF NOT EXISTS  
+    (SELECT * FROM sys.credentials
+    WHERE name = 'https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>')  
+    BEGIN
+        CREATE CREDENTIAL [https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>]
+        -- this name must match the container path, start with https and must not contain a forward slash at the end
+        WITH IDENTITY = 'SHARED ACCESS SIGNATURE',  -- this is a mandatory string and should not be changed   
+        SECRET = '<SAS_TOKEN>';
+    END;
+    ```
 
 2. Enable the trace flag - There is a bug and the PG is aware of it
 
-```sql
-DBCC traceon(1820,-1)
-```
+    ```sql
+    DBCC traceon(1820,-1)
+    ```
 
 3. Verify the backup file is readable, and intact
 
-```sql
-RESTORE FILELISTONLY 
-FROM URL = 'https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>/<file name>.bak'
-```
+    ```sql
+    RESTORE FILELISTONLY 
+    FROM URL = 'https://<mystorageaccountname>.blob.core.windows.net/<mystorageaccountcontainername>/<file name>.bak'
+    ```
 
 4. Prepare and run the RESTORE DATABASE
 
@@ -222,6 +257,76 @@ WITH MOVE 'Test' to '/var/opt/mssql/data/<file name>.mdf'
 ,RECOVERY;  
 GO
 ```
+
+### Copy the backup file into a Kubernetes pod
+
+1. Download the [AdventureWorks2019 backup file](https://learn.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver16&tabs=ssms#download-backup-files)
+2. Find the primary availability replica
+   1. Connect to your Arc-enabled SQL MI
+   2. Run this command
+
+        ```sql
+        SELECT @@SERVERNAME
+        ```
+
+   3. This will be the pod name to be used later
+   4. Also, you get the list of all pods by running
+
+        ```txt
+        kubectl get pods -n <namespace>
+        ```
+
+3. Copy the backup file from the local storage to the sql pod in the cluster
+
+    ```txt
+    kubectl cp <source file location> <pod name>:var/opt/mssql/data/<file name> -n <namespace>
+    ```
+
+    > [!IMPORTANT]
+    > Replace the <podname> for the result of sql statement above
+
+    ```text
+    kubectl cp C:\temp\AdventureWorks2019.bak sql-mi-gp-0:var/opt/mssql/data/AdventureWorks2019.bak -n arc-idc-ns
+    ```
+
+4. Restore the database
+
+    Prepare the restore command. Use the RESTORE FILELISTONLY command to obtain a list of the files contained in a backup set.
+
+    ```sql
+    RESTORE FILELISTONLY
+    FROM DISK = '/var/opt/mssql/data/AdventureWorks2019.bak';
+    GO
+    ```
+
+    Run the RESTORE DATABASE command.
+
+    ```txt
+    RESTORE DATABASE AdventureWorks2019
+    FROM DISK = '/var/opt/mssql/data/AdventureWorks2019.bak'
+    WITH
+        MOVE <logical name>
+        TO '/var/opt/mssql/data/AdventureWorks2019.mdf'
+    , MOVE <logical name>
+        TO '/var/opt/mssql/data/AdventureWorks2019_log.ldf'
+    , RECOVERY;
+    GO
+    ```
+
+    > [!IMPORTANT]
+    > Replace the <logical name> for the logical name of each file
+
+    ```txt
+    RESTORE DATABASE AdventureWorks2019
+    FROM DISK = '/var/opt/mssql/data/AdventureWorks2019.bak'
+    WITH
+        MOVE 'AdventureWorks2019'
+        TO '/var/opt/mssql/data/AdventureWorks2019.mdf'
+    , MOVE 'AdventureWorks2019_log'
+        TO '/var/opt/mssql/data/AdventureWorks2019_log.ldf'
+    , RECOVERY;
+    GO
+    ```
 
 ## Transparent Data Encryption (TDE)
 
@@ -268,14 +373,14 @@ GO
 
 1. Back up the certificate from the container to /var/opt/mssql/data
 
-```sql
-USE master;
-GO
+    ```sql
+    USE master;
+    GO
 
-BACKUP CERTIFICATE <cert-name> TO FILE = '<cert-path>'
-WITH PRIVATE KEY ( FILE = '<private-key-path>',
-ENCRYPTION BY PASSWORD = '<UseStrongPasswordHere>');
-```
+    BACKUP CERTIFICATE <cert-name> TO FILE = '<cert-path>'
+    WITH PRIVATE KEY ( FILE = '<private-key-path>',
+    ENCRYPTION BY PASSWORD = '<UseStrongPasswordHere>');
+    ```
 
 2. Copy the certificate from the container to your file system
 
@@ -286,7 +391,9 @@ ENCRYPTION BY PASSWORD = '<UseStrongPasswordHere>');
 
     To get pods name use this command
 
-    `kubectl get pods -n <namespace>`
+    ```txt
+    kubectl get pods -n <namespace>
+    ```
 
 3. Copy the private key from the container to your file system
 
