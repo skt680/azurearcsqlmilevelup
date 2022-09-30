@@ -178,7 +178,7 @@
 
      ```txt
      az network nsg list -g <Node RG Name> --query "[].{NSGName:name}" -o table
-     ```txt
+     ```
 
     2. Add NSG rule to allow your IP
 
@@ -387,7 +387,7 @@ SQL Server agent is disabled by default.
 
     Run the RESTORE DATABASE command.
 
-    ```txt
+    ```sql
     RESTORE DATABASE AdventureWorks2019
     FROM DISK = '/var/opt/mssql/data/AdventureWorks2019.bak'
     WITH
@@ -402,7 +402,7 @@ SQL Server agent is disabled by default.
     > [!IMPORTANT]
     > Replace the <logical name> for the logical name of each file
 
-    ```txt
+    ```sql
     RESTORE DATABASE AdventureWorks2019
     FROM DISK = '/var/opt/mssql/data/AdventureWorks2019.bak'
     WITH
